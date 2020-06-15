@@ -1,5 +1,5 @@
 ## Docker deployment with GitHub Actions
-![Docker CI](https://github.com/lfbatista/deployment-interview/workflows/Docker%20CI/badge.svg)
+![Docker CI](https://github.com/lfbatista/docker-tensorflow-ci/workflows/Docker%20CI/badge.svg)
 ![Docker Image Version](https://img.shields.io/docker/v/batistaluisfilipe/docker-tensorflow-ci)
 [![Docker Image Size](https://img.shields.io/docker/image-size/batistaluisfilipe/docker-tensorflow-ci)](https://hub.docker.com/r/batistaluisfilipe/docker-tensorflow-ci)
 [![Docker layers](https://img.shields.io/microbadger/layers/batistaluisfilipe/docker-tensorflow-ci)](https://hub.docker.com/r/batistaluisfilipe/docker-tensorflow-ci)
