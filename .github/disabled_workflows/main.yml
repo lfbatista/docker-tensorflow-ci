@@ -1,0 +1,60 @@
+# This is a basic workflow to help you get started with Actions
+
+name: CI
+
+# Controls when the action will run. Triggers the workflow on push or pull request
+# events but only for the master branch
+on:
+  push:
+    branches: [ heroku ]
+  pull_request:
+    branches: [ master ]
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+# This is a basic workflow to help you get started with Actions
+
+name: CI
+
+# Controls when the action will run. Triggers the workflow on push or pull request
+# events but only for the master branch
+on:
+  push:
+    branches: [ heroku ]
+  pull_request:
+    branches: [ master ]
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+    - name: Run a one-line script
+        run: |
+          pwd && ls -al
+          cd .. && pwd && ls
+          cd .. && pwd && ls
+          cd .. && pwd && ls
+          cd .. && pwd && ls
+#       - name: Checkout
+#         uses: actions/checkout@v2
+#       - name: Build, Push and Deploy to Heroku #set the whatever name you want to this step
+#         id: heroku
+#         uses: jctaveras/heroku-deploy@v1.0.0  # use the latest version of the action
+#         with:
+#           email: ${{ secrets.HEROKU_EMAIL }} # your heroku email
+#           api_key: ${{ secrets.HEROKU_API_KEY }} # your  heroku api key
+#           app_name: ${{ secrets.HEROKU_APP_NAME }} # you aplication name
+#           dockerfile_path: '' # set the path to the folder wher the Dokerfile is located
+#           options: '-t heroku:latest' # Docker Build Options

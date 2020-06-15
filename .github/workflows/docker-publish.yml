@@ -1,0 +1,125 @@
+name: Docker CI
+
+on:
+  push:
+    # Publish `master` as Docker `latest` image.
+    branches:
+      - master
+
+    # Publish `v1.2.3` tags as releases.
+    tags:
+      - v*  
+
+  # Run tests for any PRs.
+  pull_request:
+
+env:
+  IMAGE_NAME: deployment
+  
+jobs:
+  model:
+    name: Download and push model
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Download model
+        run: |
+          MODEL_NAME=model
+          #curl -L http://download.tensorflow.org/models/object_detection/ssdlite_mobilenet_v2_coco_2018_05_09.tar.gz -o $MODEL_NAME.tar.gz
+          curl -L http://download.tensorflow.org/models/object_detection/ssd_mobilenet_v1_coco_2018_01_28.tar.gz -o $MODEL_NAME.tar.gz
+          echo "$MODEL_NAME downloaded, extracting:"
+          mkdir $MODEL_NAME
+          tar -xzvf $MODEL_NAME.tar.gz -C $MODEL_NAME --strip-components 1
+          mkdir -p app/model
+          mv $MODEL_NAME/saved_model/saved_model.pb app/model
+          rm -r $MODEL_NAME*
+          echo "Model replaced."
+      - name: Push model
+        run: |
+          git config --global user.name "lfbatista"
+          git config --global user.email "batistaluisfilipe@gmail.com"
+          git add -A
+          git diff --quiet && git diff --staged --quiet || git commit -m "Update saved_model.pb"
+          git push
+
+  test:
+    needs: model
+    
+    name: Test Docker build
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Run tests
+        run: |
+          if [ -f docker-compose.test.yml ]; then
+            docker-compose --file docker-compose.test.yml build
+            docker-compose --file docker-compose.test.yml run sut
+          else
+            #docker build . --file Dockerfile
+            echo "pass"
+          fi
+
+  push:
+    needs: test
+
+    name: Push Docker image
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Build image
+        run: docker build . --file Dockerfile --tag $IMAGE_NAME
+
+      - name: Log into registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
+
+      - name: Push image
+        run: |
+          IMAGE_ID=docker.pkg.github.com/${{ github.repository }}/$IMAGE_NAME
+
+          # Change all uppercase to lowercase
+          IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
+
+          # Strip git ref prefix from version
+          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+
+          # Strip "v" prefix from tag name
+          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
+
+          # Use Docker `latest` tag convention
+          [ "$VERSION" == "master" ] && VERSION=latest
+
+          echo IMAGE_ID=$IMAGE_ID
+          echo VERSION=$VERSION
+
+          docker tag $IMAGE_NAME $IMAGE_ID:$VERSION
+          docker push $IMAGE_ID:$VERSION
+
+  deploy:
+    needs: test
+    
+    name: Deploy to Heroku
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Copy repo to home
+      run: cp -r * /home/runner/
+    - name: Build, Push and Deploy to Heroku
+      id: heroku
+      uses: lfbatista/heroku-deploy@v1.0.0
+      with:
+        email: ${{ secrets.HEROKU_EMAIL }}
+        api_key: ${{ secrets.HEROKU_API_KEY }}
+        app_name: ${{ secrets.HEROKU_APP_NAME }}
+        dockerfile_path: '.'
+        #options: '-t heroku:latest'
