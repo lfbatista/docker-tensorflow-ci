@@ -4,15 +4,13 @@
 [![Docker Image Size](https://img.shields.io/docker/image-size/batistaluisfilipe/docker-tensorflow-ci)](https://hub.docker.com/r/batistaluisfilipe/docker-tensorflow-ci)
 [![Docker layers](https://img.shields.io/microbadger/layers/batistaluisfilipe/docker-tensorflow-ci)](https://hub.docker.com/r/batistaluisfilipe/docker-tensorflow-ci)
 
-This repo aims to containerise, build and deploy the present app into production.
-For this use case, the app is being hosted on Heroku.
+This repo aims to containerise, build and deploy the present.
 The deployment process is triggered by push and pull request events.
 
 The main workflow `docker-publish.yml` contains 4 jobs:
 - model: downloads and pushes a new [TensorFlow model](https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/detection_model_zoo.md) to the repo
 - test: builds the Docker image (depends on model)
 - push: builds and publishes a new Docker image (depends on test)
-- deploy: builds, pushes and deploys a new Docker image to Heroku (depends on test)
 
 ### How to use this image
 ```bash

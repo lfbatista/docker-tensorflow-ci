@@ -35,8 +35,8 @@ RUN set -ex; \
     cd /tmp && curl -s  https://www.python.org/ftp/python/${PYTHON_VER}/Python-${PYTHON_VER}.tgz -LO > /dev/null; \
     tar xf Python-${PYTHON_VER}.tgz; \
     cd Python-${PYTHON_VER}; \
-    ./configure --enable-optimizations && make -j8 && make altinstall; \
-    #./configure && make -s -j8 && make -s altinstall; \
+    #./configure --enable-optimizations && make -j8 && make altinstall; \
+    ./configure && make -s -j8 && make -s altinstall; \
     ln -s /usr/local/bin/python3.6 /usr/local/bin/python; \
     ln -s /usr/local/bin/pip3.6 /usr/local/bin/pip; \
     ln -s /usr/local/bin/idle3.6 /usr/local/bin/idle; \
@@ -64,7 +64,7 @@ ARG BUILD_DATE
 ARG VCS_REF
 LABEL build-date=$BUILD_DATE \
   name="Docker Deployment with GitHub Actions" \
-  description="Docker Deployment on Heroku with GitHub Actions" \
+  description="Docker Deployment with GitHub Actions" \
   vcs-ref=$VCS_REF \
   vcs-url="https://github.com/lfbatista/docker-tensorflow-ci" \
   version="1.0" \
